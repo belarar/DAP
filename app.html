@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAP - Détection</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+        }
+        h1 { text-align: center; color: #1a2a6c; margin-bottom: 20px; }
+        button {
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 25px;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .logout {
+            background: #666;
+        }
+        .preview { text-align: center; margin: 15px 0; display: none; }
+        .preview img { max-width: 100%; border-radius: 15px; }
+        .results { text-align: center; margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 20px; display: none; }
+        .count { font-size: 48px; font-weight: bold; color: #b21f1f; }
+        .loading { text-align: center; padding: 30px; display: none; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #b21f1f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .footer { text-align: center; font-size: 11px; color: #999; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="logout" onclick="logout()">🚪 Déconnexion</button>
+        <h1>🔬 DAP</h1>
+        <p style="text-align:center">Détection Automatique des Parasites</p>
+        
+        <button id="uploadBtn">📸 Choisir une image</button>
+        
+        <div class="preview" id="preview"><img id="previewImage"></div>
+        <div class="loading" id="loading"><div class="spinner"></div><p>Analyse en cours...</p></div>
+        
+        <div class="results" id="results">
+            <h3>🦠 Parasites détectés</h3>
+            <div class="count" id="parasiteCount">0</div>
+            <h3 style="margin-top:15px">🧫 Macrophages</h3>
+            <div class="count" id="macrophageCount" style="color:#1a2a6c">0</div>
+            <button onclick="reset()" style="background:#333; margin-top:15px;">🔍 Nouvelle analyse</button>
+        </div>
+        
+        <div class="footer">DAP v1.0 | API: dap-api-wxdn.onrender.com</div>
+    </div>
+
+    <script>
+        function logout() {
+            window.location.href = 'index.html';
+        }
+        
+        document.getElementById('uploadBtn').onclick = function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('previewImage').src = e.target.result;
+                        document.getElementById('preview').style.display = 'block';
+                        detectParasites(file);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        };
+        
+        async function detectParasites(file) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Image = e.target.result.split(',')[1];
+                
+                try {
+                    const response = await fetch('https://dap-api-wxdn.onrender.com/predict', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: base64Image })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('parasiteCount').innerText = data.leishmania;
+                        document.getElementById('macrophageCount').innerText = data.macrophage;
+                        document.getElementById('resultImage').src = 'data:image/jpeg;base64,' + data.image;
+                        document.getElementById('results').style.display = 'block';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('Erreur de connexion au serveur');
+                }
+                document.getElementById('loading').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function reset() {
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
