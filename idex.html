@@ -3,150 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAP - Détection Automatique des Parasites</title>
+    <title>DAP - Connexion</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb4d 100%);
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
+        .login-box {
             background: white;
-            border-radius: 40px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .logo {
+            padding: 40px;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 350px;
             text-align: center;
-            margin-bottom: 30px;
         }
-        
-        .logo-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        .logo { font-size: 48px; margin-bottom: 20px; }
+        h1 { color: #1a2a6c; margin-bottom: 10px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 25px;
+            border: 1px solid #ddd;
         }
-        
-        .logo-icon span {
-            font-size: 40px;
-        }
-        
-        .logo h1 {
-            font-size: 32px;
-            color: #1a2a6c;
-        }
-        
-        .logo p {
-            font-size: 12px;
-            color: #b21f1f;
-            letter-spacing: 2px;
-        }
-        
-        .upload-btn {
+        button {
             background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
             color: white;
             border: none;
-            padding: 16px;
+            padding: 12px;
             width: 100%;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 20px 0;
+            border-radius: 25px;
+            font-size: 16px;
+            margin-top: 15px;
             cursor: pointer;
         }
-        
-        .result {
-            text-align: center;
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 20px;
-        }
-        
-        .parasite-count {
-            font-size: 56px;
-            font-weight: bold;
-            color: #b21f1f;
-        }
-        
-        .macrophage-count {
-            font-size: 56px;
-            font-weight: bold;
-            color: #1a2a6c;
-        }
-        
-        .footer {
-            text-align: center;
-            font-size: 10px;
-            color: #999;
-            margin-top: 20px;
-        }
-        
-        button {
-            cursor: pointer;
-        }
+        .demo { margin-top: 20px; font-size: 12px; color: #666; }
+        .error { color: red; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <div class="logo-icon">
-                <span>🔬</span>
-            </div>
-            <h1>DAP</h1>
-            <p>Détection Automatique des Parasites</p>
-        </div>
+    <div class="login-box">
+        <div class="logo">🔬</div>
+        <h1>DAP</h1>
+        <p>Détection Automatique des Parasites</p>
         
-        <button class="upload-btn" id="uploadBtn">
-            📸 Choisir une image
-        </button>
+        <input type="text" id="username" placeholder="Nom d'utilisateur">
+        <input type="password" id="password" placeholder="Mot de passe">
+        <button onclick="login()">Se connecter</button>
         
-        <div class="result">
-            <h3>🦠 Parasites détectés</h3>
-            <div class="parasite-count" id="parasiteCount">0</div>
-            <h3 style="margin-top: 15px;">🧫 Macrophages</h3>
-            <div class="macrophage-count" id="macrophageCount">0</div>
-        </div>
-        
-        <div class="footer">
-            DAP v1.0 | Modèle YOLOv8 | mAP50: 81.6%
-        </div>
+        <div class="demo">user / 123</div>
+        <div class="error" id="errorMsg">Identifiants incorrects</div>
     </div>
-    
+
     <script>
-        document.getElementById('uploadBtn').onclick = function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const randomParasite = Math.floor(Math.random() * 15) + 1;
-                    const randomMacrophage = Math.floor(Math.random() * 8) + 1;
-                    document.getElementById('parasiteCount').innerText = randomParasite;
-                    document.getElementById('macrophageCount').innerText = randomMacrophage;
-                    alert('Analyse terminée! ' + randomParasite + ' parasite(s) détecté(s)');
-                }
-            };
-            input.click();
-        };
+        function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            if(user === 'user' && pass === '123') {
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
